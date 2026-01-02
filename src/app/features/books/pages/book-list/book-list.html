@@ -9,51 +9,11 @@
 
     <!-- Grid de libros -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      
+    
       @for (book of books; track book.id) {
-        <div class="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2">
-          
-          <!-- Imagen de portada -->
-          <div class="relative h-80 overflow-hidden bg-gray-200">
-            <img 
-              [src]="book.coverUrl" 
-              [alt]="book.title"
-              class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-            
-            <!-- Overlay que aparece al hacer hover -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-              <div class="text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                <p class="text-sm font-medium mb-1">{{ book.author }}</p>
-                <p class="text-xs text-gray-300">Publicado en {{ book.year }}</p>
-              </div>
-            </div>
-
-            <!-- Badge del año (esquina superior derecha) -->
-            <div class="absolute top-3 right-3 bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              {{ book.year }}
-            </div>
-          </div>
-
-          <!-- Información del libro -->
-          <div class="p-4">
-            <h3 class="text-lg font-bold text-gray-800 mb-1 line-clamp-2 group-hover:text-orange-600 transition-colors">
-              {{ book.title }}
-            </h3>
-            <p class="text-sm text-gray-600 mb-2">{{ book.author }}</p>
-            
-            <!-- Botón de acción -->
-            <button 
-              type="button"
-              class="w-full mt-2 bg-gradient-to-r from-amber-600 to-orange-700 text-white py-2 rounded-lg text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:from-amber-700 hover:to-orange-800 transform translate-y-2 group-hover:translate-y-0"
-            >
-              Ver detalles
-            </button>
-          </div>
-
-        </div>
+      <app-book-card [book]="book" (viewDetails)="goToDetails($event)">
+      </app-book-card>
       }
-
     </div>
 
     <!-- Mensaje cuando no hay libros -->

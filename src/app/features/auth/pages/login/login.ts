@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth/auth';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 
 @Component({
@@ -21,13 +21,15 @@ export class Login {
   registerForm: FormGroup;
   isLoading: boolean = false;
   isLoginMode: boolean = true; // true = login, false = registro
+  returnUrl: string = '/books'; // valor por defecto
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private toastr: ToastrService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
+    private route: ActivatedRoute
   ) {
 
     this.loginForm = this.fb.group({
@@ -38,6 +40,12 @@ export class Login {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
+    });
+
+    this.route.queryParams.subscribe(params => {
+      if (params['returnUrl']) {
+        this.returnUrl = params['returnUrl'];
+      }
     });
   }
 

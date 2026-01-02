@@ -3,30 +3,33 @@ import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { BooksService } from '../../services/books/books';
 import { Book } from '../../models/book.model';
 import { catchError, finalize, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BookCard } from "../../components/book-card/book-card";
 
 @Component({
   standalone: true,
   selector: 'app-book-list',
-  imports: [CommonModule],
+  imports: [CommonModule, BookCard],
   templateUrl: './book-list.html',
   styleUrl: './book-list.scss',
 })
 export class BookList {
-
   books: Book[] = [];
   isLoading = true;
 
   constructor(
     private booksService: BooksService,
     private zone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loadBooks();
   }
 
-loadBooks() {
+  loadBooks() {
     this.isLoading = true;
 
     this.booksService
@@ -49,4 +52,8 @@ loadBooks() {
       });
   }
 
+  goToDetails(bookId: number) {
+    this.router.navigate([bookId], { relativeTo: this.route });
+    // o absolute: ['/books', bookId]
+  }
 }

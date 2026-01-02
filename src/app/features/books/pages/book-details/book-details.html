@@ -1,0 +1,110 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-6xl mx-auto px-4">
+
+    <!-- Botón volver -->
+    <button (click)="goBack()" class="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-medium">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Volver al catálogo
+    </button>
+
+    <!-- Loading -->
+    @if(loading()) {
+      <div class="flex justify-center items-center py-20">
+        <div class="text-gray-500">Cargando detalles del libro...</div>
+      </div>
+    } @else if(book()) {
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="grid md:grid-cols-3 gap-8 p-8">
+          <!-- Columna izquierda: Portada -->
+          <div class="md:col-span-1">
+            <div class="sticky top-24">
+              <img [src]="book()!.coverUrl" [alt]="book()!.title"
+                   class="w-full rounded-lg shadow-lg border border-gray-200"
+                   (error)="onImageError($event)">
+              <div class="mt-6 space-y-3">
+                <button (click)="addToCart()" [disabled]="!hasAvailableCopies()"
+                        [class]="hasAvailableCopies() ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
+                        class="w-full py-3 px-4 rounded-lg font-medium transition-all shadow-sm">
+                  {{ hasAvailableCopies() ? 'Añadir a préstamos' : 'No disponible' }}
+                </button>
+                @if(hasAvailableCopies()) {
+                  <div class="text-center text-sm text-green-600 font-medium">
+                    ✓ {{ getAvailableCopiesCount() }} {{ getAvailableCopiesCount() === 1 ? 'ejemplar disponible' : 'ejemplares disponibles' }}
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna derecha: Información del libro -->
+          <div class="md:col-span-2 space-y-6">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ book()!.title }}</h1>
+              <p class="text-xl text-gray-600">
+                por <span class="font-semibold text-blue-600">{{ book()!.author }}</span>
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                {{ book()!.genre }}
+              </span>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+              <h2 class="text-lg font-semibold text-gray-900 mb-3">Descripción</h2>
+              <p class="text-gray-700 leading-relaxed">{{ book()!.description }}</p>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Detalles del libro</h2>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <p class="text-sm text-gray-500">Editorial</p>
+                  <p class="font-medium text-gray-900">{{ book()!.publisher }}</p>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm text-gray-500">Año de publicación</p>
+                  <p class="font-medium text-gray-900">{{ book()!.year }}</p>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm text-gray-500">ISBN</p>
+                  <p class="font-medium text-gray-900">{{ book()!.isbn }}</p>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm text-gray-500">Ejemplares totales</p>
+                  <p class="font-medium text-gray-900">{{ book()!.copies.length }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Estado de ejemplares</h2>
+              <div class="space-y-2">
+                @for(copy of book()!.copies; track copy.inventoryCode) {
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex items-center gap-3">
+                      <span class="font-mono text-sm text-gray-600">{{ copy.inventoryCode }}</span>
+                    </div>
+                    <span [class]="getStatusClass(copy.status)"
+                          class="px-3 py-1 rounded-full text-xs font-semibold">
+                      {{ getStatusText(copy.status) }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-20">
+        <p class="text-gray-500 text-lg">No se encontró el libro</p>
+      </div>
+    }
+
+  </div>
+</div>
