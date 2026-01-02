@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { AuthService } from '../../../../features/auth/services/auth/auth';
+import { AuthService } from '../../../features/auth/services/auth/auth';
 
 @Component({
   selector: 'app-header',

@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/books/books';
 import { BookDetails } from '../../models/book-details.model';
+import { AlertService } from '../../../../shared/services/alert.service';
 
 @Component({
   selector: 'app-book-details',
@@ -17,7 +18,8 @@ export class BookDetailsView {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private bookService: BooksService
+    private bookService: BooksService,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -47,8 +49,8 @@ export class BookDetailsView {
   addToCart(): void {
     if (this.hasAvailableCopies()) {
       console.log('Añadiendo libro al carrito:', this.book()!.id);
+      this.alertService.success('Libro añadido a préstamos');
       // this.cartService.addBook(this.book()!.id);
-      alert('Libro añadido a préstamos');
     }
   }
 

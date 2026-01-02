@@ -9,10 +9,7 @@ import { catchError, finalize, of } from 'rxjs';
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
@@ -31,74 +28,83 @@ export class Login {
     private zone: NgZone,
     private route: ActivatedRoute
   ) {
-
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
     });
 
     this.registerForm = this.fb.group({
+      name: ['', Validators.required],
+      surname: ['', Validators.required],
+      dni: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       username: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', [Validators.required, Validators.minLength(8)]],
     });
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       if (params['returnUrl']) {
         this.returnUrl = params['returnUrl'];
       }
     });
   }
 
- onSubmit() {
-  if (this.loginForm.invalid) return;
+  onSubmit() {
+    if (this.loginForm.invalid) return;
 
-  this.isLoading = true;
+    this.isLoading = true;
 
-  const { username, password } = this.loginForm.value;
+    const { username, password } = this.loginForm.value;
 
-  this.authService
-    .login(username, password)
-    .pipe(
-      catchError((err) => {
-        const msg = err?.error?.message ?? err?.message ?? 'Error al iniciar sesión';
-        this.toastr.error(msg, 'Login failed');
-        return of(null);
-      }),
-      finalize(() => (this.isLoading = false))
-    )
-    .subscribe((token) => {
-      if (token) {
-        this.toastr.success('Login successful', 'Welcome!');
-        this.router.navigate(['/books']);
-      }
-    });
-}
-
-onRegister() {
-    if (this.registerForm.invalid) return;
-
-    this.zone.run(() => this.isLoading = true);
-
-    const { username, password } = this.registerForm.value;
-
-    this.authService.login(username, password) // TODO: Cambiar a método de registro cuando esté disponible
+    this.authService
+      .login(username, password)
       .pipe(
-        catchError(err => {
-          this.zone.run(() => this.isLoading = false);
-          this.toastr.error(err.message, 'Error en el registro');
+        catchError((err) => {
+          const msg = err?.error?.message ?? err?.message ?? 'Error al iniciar sesión';
+          this.toastr.error(msg, 'Login failed');
           return of(null);
         }),
-        finalize(() => this.zone.run(() => this.isLoading = false))
+        finalize(() => (this.isLoading = false))
       )
-      .subscribe(user => {
-        if (user) {
+      .subscribe((token) => {
+        if (token) {
+          this.toastr.success('Login successful', 'Welcome!');
+          this.router.navigate(['/books']);
+        }
+      });
+  }
+
+  onRegister() {
+    if (this.registerForm.invalid) return;
+
+    this.zone.run(() => (this.isLoading = true));
+
+    const { username, password, name, surname, email, dni } = this.registerForm.value;
+
+    this.authService
+      .register(username, password, name, surname, email, dni)
+      .pipe(
+        catchError((err) => {
+          this.zone.run(() => (this.isLoading = false));
+          const msg =
+            (typeof err?.error === 'string' && err.error) ||
+            err?.error?.message ||
+            err?.message ||
+            'Error en el registro';
+          this.toastr.error(msg, 'Error en el registro');
+          return of(null);
+        }),
+        finalize(() => this.zone.run(() => (this.isLoading = false)))
+      )
+      .subscribe((result) => {
+        if (result) {
           this.toastr.success('Registro exitoso', '¡Cuenta creada!');
           // Opción 1: Redirigir directamente a books si el registro hace login automático
-          this.router.navigate(['/books']);
-          
+          //this.router.navigate(['/books']);
+
           // Opción 2: Cambiar a modo login para que inicie sesión manualmente
-          // this.isLoginMode = true;
-          // this.registerForm.reset();
+          this.isLoginMode = true;
+          this.registerForm.reset();
         }
       });
   }

@@ -20,6 +20,7 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(username: string, password: string) {
+    localStorage.removeItem(this.TOKEN_KEY);
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/login`, { username, password })
       .pipe(
@@ -35,6 +36,19 @@ export class AuthService {
       );
   }
 
+  register(
+    username: string,
+    password: string,
+    name: string,
+    surname: string,
+    email: string,
+    dni: string
+  ): Observable<string> {
+    return this.http
+      .post(`${this.apiUrl}/register`, { username, password, name, surname, email, dni }, { responseType: 'text' })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+  
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     this.isAuthenticated.set(false);

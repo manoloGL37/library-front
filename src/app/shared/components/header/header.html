@@ -1,0 +1,77 @@
+<header class="fixed top-0 left-0 right-0 bg-white border-b border-orange-100 z-50 shadow-md backdrop-blur-sm bg-opacity-95">
+  <div class="max-w-7xl mx-auto py-4 flex items-center justify-between">
+    
+    <!-- Logo/Nombre de la biblioteca -->
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-orange-700 rounded-xl flex items-center justify-center text-white shadow-lg transform hover:scale-105 transition-transform">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent">
+          Biblioteca Digital
+        </h1>
+        <p class="text-xs text-gray-500">Tu espacio de lectura</p>
+      </div>
+    </div>
+
+    <!-- Navegación y acciones -->
+    <div class="flex items-center gap-4">
+      
+      <!-- Carrito de préstamos -->
+      <button 
+        (click)="onCartClick()"
+        class="relative flex items-center gap-2 px-4 py-2.5 hover:bg-orange-50 rounded-xl transition-all group">
+        <div class="relative">
+          <svg class="w-6 h-6 text-gray-700 group-hover:text-orange-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          
+          <!-- Badge con cantidad -->
+          @if (cartCount() > 0) {
+            <span class="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse">
+              {{ cartCount() }}
+            </span>
+          }
+        </div>
+        <span class="text-gray-700 font-medium group-hover:text-orange-600 transition-colors">Préstamos</span>
+      </button>
+
+      <!-- Separador vertical -->
+      <div class="h-10 w-px bg-gradient-to-b from-transparent via-orange-200 to-transparent"></div>
+
+      <!-- Usuario autenticado -->
+      @if (isAuthenticated()) {
+        <div class="flex items-center gap-3">
+          <!-- Avatar y saludo -->
+          <div class="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-orange-200 shadow-sm h-[46px]">
+            <div class="w-9 h-9 bg-gradient-to-br from-amber-600 to-orange-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+              {{ getUserInitial() }}
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-gray-500">Bienvenido</span>
+              <span class="text-sm font-semibold bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent">
+                {{ userName() }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Botón logout -->
+          <button 
+            (click)="onLogout()"
+            class="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2 h-[46px]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            Salir
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</header>
+
+<!-- Espaciador para compensar el header fijo -->
+<div class="h-20"></div>
