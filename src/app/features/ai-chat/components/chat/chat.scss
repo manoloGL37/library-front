@@ -1,0 +1,14 @@
+/* Suaviza el scroll automático */
+:host ::ng-deep .overflow-y-auto {
+  scroll-behavior: smooth;
+}
+
+/* Ajuste fino de la animación de typing */
+@keyframes bounce {
+  0%, 80%, 100% { 
+    transform: translateY(0);
+  }
+  40% { 
+    transform: translateY(-10px);
+  }
+}

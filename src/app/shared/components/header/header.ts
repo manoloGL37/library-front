@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { AuthService } from '../../../features/auth/services/auth/auth';
+import { AuthService } from '../../../features/auth/services/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +14,7 @@ export class Header {
   userName = signal('Usuario');
   cartCount = signal(0);
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
     this.loadInitialState();
   }
 
@@ -32,8 +33,11 @@ export class Header {
    */
   onCartClick(): void {
     console.log('Navegar al carrito de préstamos');
-    // Implementar navegación o apertura de panel
-    // this.router.navigate(['/cart']);
+    this.router.navigate(['/loans']);
+  }
+
+  onLogoClick(): void {
+    this.router.navigate(['/books']);
   }
 
   /**

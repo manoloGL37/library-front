@@ -34,7 +34,7 @@
 
               <!-- Botón de acción -->
               <div class="mt-6 space-y-3">
-                <button (click)="addToCart()" [disabled]="!hasAvailableCopies()"
+                <button (click)="openLoanModal(book())" [disabled]="!hasAvailableCopies()"
                         [class]="hasAvailableCopies() 
                           ? 'bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-700 hover:to-orange-800 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5' 
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
@@ -169,5 +169,16 @@
       </div>
     }
 
+    
+
   </div>
+
+@if (showLoanModal() && selectedBook()) {
+  <app-loan-confirm-modal
+    [bookTitle]="selectedBook()!.title"
+    (confirm)="onConfirmLoan($event)"
+    (cancel)="closeLoanModal()">
+  </app-loan-confirm-modal>
+}
+
 </div>

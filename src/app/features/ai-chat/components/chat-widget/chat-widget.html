@@ -1,0 +1,139 @@
+<!-- Chat Widget Container -->
+<div class="fixed bottom-6 right-6 z-50">
+  
+  <!-- Chat Window -->
+  @if (isOpen) {
+    <div class="mb-4 w-96 h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-slide-up">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Bot Avatar -->
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold">Asistente Bibliotecario</h3>
+            <p class="text-xs text-blue-100">En línea</p>
+          </div>
+        </div>
+        
+        <button (click)="toggleChat()" 
+                class="text-white hover:bg-white/20 rounded-lg p-2 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Messages Container -->
+      <div #messagesContainer 
+           class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        
+        @for (msg of messages; track msg.timestamp) {
+          <div class="flex gap-2"
+               [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+            
+            <!-- Bot Avatar (solo para mensajes del asistente) -->
+            @if (msg.role === 'assistant') {
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            }
+            
+            <div class="flex flex-col max-w-[75%]"
+                 [ngClass]="msg.role === 'user' ? 'items-end' : 'items-start'">
+              
+              <!-- Message Bubble -->
+              <div class="rounded-2xl px-4 py-3 break-words shadow-sm"
+                   [ngClass]="{
+                     'bg-blue-600 text-white': msg.role === 'user',
+                     'bg-white text-gray-800 border border-gray-200': msg.role === 'assistant'
+                   }">
+                
+                <!-- Content -->
+                <p class="whitespace-pre-wrap text-sm leading-relaxed">{{ msg.content }}</p>
+                
+                <!-- Typing Indicator -->
+                @if (msg.role === 'assistant' && msg.content === '' && isTyping) {
+                  <div class="flex space-x-1 py-2">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                  </div>
+                }
+              </div>
+              
+              <!-- Timestamp -->
+              <span class="text-xs text-gray-500 mt-1 px-2">
+                {{ msg.timestamp | date:'shortTime' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+      
+      <!-- Input Area -->
+      <div class="border-t border-gray-200 p-4 bg-white">
+        <div class="flex gap-2 items-end">
+          <div class="flex-1">
+            <textarea
+              [(ngModel)]="userInput"
+              (keydown.enter)="onEnterPress($event)"
+              [disabled]="isLoading"
+              placeholder="Escribe tu mensaje..."
+              rows="1"
+              class="w-full px-4 py-2 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+            ></textarea>
+          </div>
+          
+          <button 
+            (click)="sendMessage()" 
+            [disabled]="isLoading || !userInput.trim()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2">
+            
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  
+  <!-- Toggle Button -->
+  <button 
+    (click)="toggleChat()"
+    class="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center group relative">
+    
+    @if (!isOpen) {
+      <!-- Chat Icon -->
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+      </svg>
+      
+      <!-- Tooltip -->
+      <div class="absolute right-full mr-4 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+        ¿Necesitas ayuda para elegir un libro? 📚
+        <div class="absolute right-0 top-1/2 transform translate-x-2 -translate-y-1/2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-gray-900"></div>
+      </div>
+    } @else {
+      <!-- Close Icon -->
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    }
+    
+    <!-- Notification Badge (opcional) -->
+    @if (!isOpen && messages.length > 0 && !hasStarted) {
+      <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold animate-pulse">
+        1
+      </span>
+    }
+  </button>
+</div>

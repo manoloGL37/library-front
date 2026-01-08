@@ -1,25 +1,31 @@
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BooksService } from '../../services/books/books';
+import { BooksService } from '../../services/books/books.service';
 import { BookDetails } from '../../models/book-details.model';
 import { AlertService } from '../../../../shared/services/alert.service';
+import { LoanConfirmModal } from "../../../loans/components/loan-confirm-modal/loan-confirm-modal";
+import { LoansService } from '../../../loans/services/loan.service';
 
 @Component({
   selector: 'app-book-details',
-  imports: [],
+  imports: [LoanConfirmModal],
   templateUrl: './book-details.html',
   styleUrl: './book-details.scss',
 })
 export class BookDetailsView {
-  book = signal<BookDetails | null>(null);  // ahora es signal
+  book = signal<BookDetails | null>(null); // ahora es signal
   loading = signal(false);
   placeholder = 'assets/images/book-placeholder.jpg';
+
+  showLoanModal = signal(false);
+  selectedBook = signal<BookDetails | null>(null);
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private bookService: BooksService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private loansService: LoansService
   ) {}
 
   ngOnInit(): void {
@@ -45,17 +51,42 @@ export class BookDetailsView {
     this.router.navigate(['/books']);
   }
 
-  // Métodos que estaban comentados
-  addToCart(): void {
-    if (this.hasAvailableCopies()) {
-      console.log('Añadiendo libro al carrito:', this.book()!.id);
-      this.alertService.success('Libro añadido a préstamos');
-      // this.cartService.addBook(this.book()!.id);
-    }
+  openLoanModal(book: BookDetails | null): void {
+    this.selectedBook.set(book);
+    this.showLoanModal.set(true);
+  }
+
+  closeLoanModal(): void {
+    this.showLoanModal.set(false);
+    this.selectedBook.set(null);
+  }
+
+  onConfirmLoan(days: 14 | 30 | 60): void {
+    const book = this.selectedBook();
+
+    if (!book) return;
+
+    this.loansService
+      .createLoan({
+        bookId: book.id,
+        loanDays: days,
+      })
+      .subscribe({
+        next: () => {
+          this.closeLoanModal();
+          this.alertService.success('Préstamo creado con éxito.');
+          this.loadBook(book.id);
+          // toast success
+        },
+        error: () => {
+          // toast error
+          this.alertService.error('Error al crear el préstamo. Inténtalo de nuevo más tarde.');
+        },
+      });
   }
 
   hasAvailableCopies(): boolean {
-    return (this.book()?.copies?.some((copy) => copy.status === 'AVAILABLE')) ?? false;
+    return this.book()?.copies?.some((copy) => copy.status === 'AVAILABLE') ?? false;
   }
 
   getAvailableCopiesCount(): number {

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
-import { BooksService } from '../../services/books/books';
+import { BooksService } from '../../services/books/books.service';
 import { Book } from '../../models/book.model';
 import { catchError, finalize, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookCard } from "../../components/book-card/book-card";
 import { FormsModule } from '@angular/forms';
+import { ChatWidget } from "../../../ai-chat/components/chat-widget/chat-widget";
 
 type BooksPageResponse = {
   content?: Book[];
@@ -16,7 +17,7 @@ type BooksPageResponse = {
 @Component({
   standalone: true,
   selector: 'app-book-list',
-  imports: [CommonModule, BookCard, FormsModule],
+  imports: [CommonModule, BookCard, FormsModule, ChatWidget],
   templateUrl: './book-list.html',
   styleUrl: './book-list.scss',
 })
@@ -43,6 +44,10 @@ export class BookList {
 
   loadBooks() {
     this.isLoading = true;
+
+    if (this.searchTerm.trim() != '') {
+      this.page = 0;
+    }
 
     this.booksService
       .getBooks(this.searchTerm, this.page, this.size)

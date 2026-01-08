@@ -21,6 +21,12 @@ export const routes: Routes = [
                         .then(m => m.BOOKS_ROUTES),
             },
             {
+                path: 'loans',
+                loadChildren: () =>
+                    import('./features/loans/loans.routes')
+                        .then(m => m.LOANS_ROUTES),
+            },
+            {
                 path: '',
                 redirectTo: 'auth/login',
                 pathMatch: 'full'

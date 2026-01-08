@@ -1,0 +1,89 @@
+<div class="flex flex-col h-[600px] max-w-4xl mx-auto border border-gray-300 rounded-lg shadow-lg overflow-hidden bg-white">
+  
+  <!-- Header -->
+  <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
+    <div>
+      <h3 class="text-lg font-semibold">Asistente Bibliotecario</h3>
+      <p class="text-sm text-blue-100">¿En qué puedo ayudarte?</p>
+    </div>
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+    </svg>
+  </div>
+  
+  <!-- Messages Container -->
+  <div #messagesContainer 
+       class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+    
+    @for (msg of messages; track msg.timestamp) {
+      <div class="flex"
+           [ngClass]="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+        
+        <div class="flex flex-col max-w-[75%]"
+             [ngClass]="msg.role === 'user' ? 'items-end' : 'items-start'">
+          
+          <!-- Message Bubble -->
+          <div class="rounded-2xl px-4 py-3 break-words shadow-sm"
+               [ngClass]="{
+                 'bg-blue-600 text-white': msg.role === 'user',
+                 'bg-white text-gray-800 border border-gray-200': msg.role === 'assistant'
+               }">
+            
+            <!-- Content -->
+            <p class="whitespace-pre-wrap text-sm leading-relaxed">{{ msg.content }}</p>
+            
+            <!-- Typing Indicator -->
+            @if (msg.role === 'assistant' && msg.content === '' && isTyping) {
+              <div class="flex space-x-1 py-2">
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+              </div>
+            }
+          </div>
+          
+          <!-- Timestamp -->
+          <span class="text-xs text-gray-500 mt-1 px-2">
+            {{ msg.timestamp | date:'short' }}
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+  
+  <!-- Input Area -->
+  <div class="border-t border-gray-200 p-4 bg-white">
+    <div class="flex gap-3 items-end">
+      
+      <div class="flex-1">
+        <textarea
+          [(ngModel)]="userInput"
+          (keydown.enter)="onEnterPress($event)"
+          [disabled]="isLoading"
+          placeholder="Escribe tu mensaje... (Enter para enviar, Shift+Enter para nueva línea)"
+          rows="1"
+          class="w-full px-4 py-3 border border-gray-300 rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+        ></textarea>
+      </div>
+      
+      <button 
+        (click)="sendMessage()" 
+        [disabled]="isLoading || !userInput.trim()"
+        class="px-6 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2">
+        
+        @if (!isLoading) {
+          <span>Enviar</span>
+        } @else {
+          <span>Enviando...</span>
+        }
+        
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+</div>

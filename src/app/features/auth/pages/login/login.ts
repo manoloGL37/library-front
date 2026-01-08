@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth/auth';
+import { AuthService } from '../../services/auth/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
@@ -62,6 +62,7 @@ export class Login {
         catchError((err) => {
           const msg = err?.error?.message ?? err?.message ?? 'Error al iniciar sesión';
           this.toastr.error(msg, 'Login failed');
+          this.isLoading = false;
           return of(null);
         }),
         finalize(() => (this.isLoading = false))
